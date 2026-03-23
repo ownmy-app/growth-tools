@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """
 System 5: CRM + outreach sequencer.
 Every detected lead enters a pipeline: category, pain, source, suggested response, follow-up.
@@ -12,7 +13,6 @@ _root = Path(__file__).resolve().parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from config.settings import get_settings
 from core.db import (
     get_leads_by_status,
     get_lead_by_id,

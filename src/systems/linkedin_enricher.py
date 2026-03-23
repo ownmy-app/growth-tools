@@ -20,7 +20,6 @@ Output columns added to the CSV:
     top_tools        Comma-separated tool suggestions
 """
 
-import csv
 import json
 import math
 import os
@@ -83,7 +82,7 @@ def get_user_profile(api, public_id: str) -> dict:
             {"title": e.get("title", ""), "description": e.get("description", "")}
             for e in data.get("experience", [])
         ],
-        "languages": [l.get("name", "") for l in data.get("languages", [])],
+        "languages": [lang.get("name", "") for lang in data.get("languages", [])],
         "skills": [s.get("name", "") for s in data.get("skills", [])],
     }
 
@@ -150,7 +149,7 @@ def enrich_csv(input_path: str, output_path: Optional[str] = None) -> str:
     openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
     df = pd.read_csv(input_path)
-    data = list(df.itertuples(index=True))
+    _data = list(df.itertuples(index=True))
 
     for idx, row in df.iterrows():
         top_tools_val = row.get("top_tools", "")

@@ -1,9 +1,9 @@
+# ruff: noqa: E402
 """
 System 2: Discord trigger bot.
 Watch channels for pain phrases; classify with LLM; respond only when confidence > threshold.
 Throttles per channel and optionally logs leads to CRM.
 """
-import asyncio
 import logging
 import sys
 import time

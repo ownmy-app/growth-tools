@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """
 System 1: Reddit lead capture.
 Monitor subreddits for high-intent posts, classify with LLM, persist to CRM.

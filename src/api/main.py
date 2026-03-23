@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """
 FastAPI app: website auditor + GitHub repo auditor.
 Run: uvicorn api.main:app --reload (from growth-tools dir)
