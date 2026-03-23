@@ -11,7 +11,7 @@ This makes growth-tools reusable for any dev-tool company without forking.
 import json
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 

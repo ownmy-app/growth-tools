@@ -3,7 +3,6 @@ System 4: Inbound website auditor.
 User pastes app URL; detect stack from HTML/headers; generate production-readiness report.
 """
 import logging
-import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
