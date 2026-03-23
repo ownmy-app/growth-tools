@@ -9,14 +9,14 @@ _root = Path(__file__).resolve().parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from pydantic import BaseModel  # noqa: E402
 
-from systems.website_auditor import audit_url as website_audit
-from systems.github_auditor import analyze_repo_url as github_audit
-from systems.crm_sequencer import add_lead
-from core.db import is_db_available
+from systems.website_auditor import audit_url as website_audit  # noqa: E402
+from systems.github_auditor import analyze_repo_url as github_audit  # noqa: E402
+from systems.crm_sequencer import add_lead  # noqa: E402
+from core.db import is_db_available  # noqa: E402
 
 app = FastAPI(
     title="Growth Tools API",
