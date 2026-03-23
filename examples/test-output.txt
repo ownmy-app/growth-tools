@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-9.0.2, pluggy-1.5.0 -- /Users/architsharma/miniconda3/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /private/tmp/ownmy-releases/growth-tools
+configfile: pyproject.toml
+plugins: anyio-4.12.1, cov-7.1.0
+collecting ... collected 4 items
+
+tests/test_brand_config.py::test_brand_name_reads_from_env PASSED        [ 25%]
+tests/test_brand_config.py::test_brand_tagline_reads_from_env PASSED     [ 50%]
+tests/test_brand_config.py::test_icp_pain_reads_from_env PASSED          [ 75%]
+tests/test_brand_config.py::test_no_hardcoded_brand_names_in_source PASSED [100%]
+
+============================== 4 passed in 0.03s ===============================

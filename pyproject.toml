@@ -30,12 +30,19 @@ dependencies = [
     "python-dotenv>=1.0.0",
 ]
 
-[project.scripts]
-growth-reddit  = "growth_tools.run_reddit:main"
-growth-api     = "growth_tools.run_api:main"
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-cov"]
 
-[tool.hatch.build.targets.wheel.sources]
-"src" = "growth_tools"
+[project.scripts]
+growth-reddit = "growth_tools.run_reddit:main"
+growth-api    = "growth_tools.run_api:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["growth_tools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
 
 [project.urls]
-Repository = "https://github.com/YOUR_ORG/growth-tools"
+Repository = "https://github.com/ownmy-app/growth-tools"

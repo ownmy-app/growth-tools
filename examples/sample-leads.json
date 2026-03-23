@@ -1,0 +1,78 @@
+[
+  {
+    "id": "reddit_abc123",
+    "source": "reddit",
+    "platform_url": "https://reddit.com/r/SaaS/comments/abc123/is_there_a_good_solution_for_multi_tenant_auth",
+    "author": "u/buildingmysaas",
+    "content": "We're trying to build a multi-tenant SaaS on top of Supabase but running into issues with RLS and per-tenant schemas. Anyone have a good solution? Currently we're on Vercel + Next.js.",
+    "subreddit": "SaaS",
+    "score": 0.87,
+    "rule_score": 0.75,
+    "llm_intent_score": 0.99,
+    "scoring_breakdown": {
+      "keyword_hits": ["supabase", "multi-tenant", "RLS", "Next.js"],
+      "pain_match": "schema isolation, auth complexity",
+      "intent": "actively evaluating solutions"
+    },
+    "outreach_draft": "Hey! Saw your post about multi-tenant Supabase — we built a schema-per-tenant migration tool that handles exactly this. It sets up isolated app_{id} schemas with RLS and Supabase auth wired in. Happy to share a quick demo if that's useful.",
+    "captured_at": "2026-03-22T09:14:32Z",
+    "status": "new"
+  },
+  {
+    "id": "reddit_def456",
+    "source": "reddit",
+    "platform_url": "https://reddit.com/r/webdev/comments/def456/migrating_from_firebase_to_supabase",
+    "author": "u/migrationpain",
+    "content": "Has anyone migrated from Firebase to Supabase? We have ~50k users and need to move auth and the Firestore data. Looking for tools that can help automate this.",
+    "subreddit": "webdev",
+    "score": 0.71,
+    "rule_score": 0.65,
+    "llm_intent_score": 0.77,
+    "scoring_breakdown": {
+      "keyword_hits": ["firebase", "supabase", "migrate", "auth"],
+      "pain_match": "migration complexity, user data",
+      "intent": "looking for migration tooling"
+    },
+    "outreach_draft": "We help teams migrate from Firebase to Supabase — auth users, Firestore collections, and storage. Done it for teams with 100k+ users. Worth a call?",
+    "captured_at": "2026-03-22T10:02:11Z",
+    "status": "new"
+  },
+  {
+    "id": "discord_ghi789",
+    "source": "discord",
+    "platform_url": "https://discord.com/channels/1016518.../#general",
+    "author": "devuser#4821",
+    "content": "anyone tried deploying a manus.im project to their own infra? want to use postgres instead of their managed db",
+    "channel": "general",
+    "score": 0.63,
+    "rule_score": 0.58,
+    "llm_intent_score": 0.68,
+    "scoring_breakdown": {
+      "keyword_hits": ["manus", "postgres", "deploy", "infra"],
+      "pain_match": "vendor lock-in, self-hosting",
+      "intent": "exploring self-hosting options"
+    },
+    "outreach_draft": "Hey! We have a one-command tool that migrates Manus projects to self-hosted Supabase + Postgres. Takes about 5 minutes. DM me if you want to try it.",
+    "captured_at": "2026-03-22T11:45:00Z",
+    "status": "contacted"
+  },
+  {
+    "id": "reddit_jkl012",
+    "source": "reddit",
+    "platform_url": "https://reddit.com/r/nextjs/comments/jkl012/security_review_of_ai_generated_code",
+    "author": "u/securityminded",
+    "content": "We used Bolt to generate our MVP and now our CTO wants a security review before we go to production. Anyone know a good tool that catches secrets and SQL injection in AI-generated code?",
+    "subreddit": "nextjs",
+    "score": 0.92,
+    "rule_score": 0.88,
+    "llm_intent_score": 0.96,
+    "scoring_breakdown": {
+      "keyword_hits": ["bolt", "security", "secrets", "SQL injection", "AI-generated"],
+      "pain_match": "production security, AI code quality",
+      "intent": "actively searching for a specific tool"
+    },
+    "outreach_draft": "We built a free static scanner specifically for AI-generated code (Bolt, Lovable, v0). Catches hardcoded secrets, SQL injection, CORS misconfigs — zero dependencies, runs in CI. Check it out at github.com/ownmy-app/security-scanner",
+    "captured_at": "2026-03-22T14:30:55Z",
+    "status": "new"
+  }
+]
