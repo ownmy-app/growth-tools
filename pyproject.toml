@@ -38,11 +38,11 @@ growth-reddit = "growth_tools.run_reddit:main"
 growth-api    = "growth_tools.run_api:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["growth_tools"]
+packages = ["src/growth_tools"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
 
 [project.urls]
-Repository = "https://github.com/ownmy-app/growth-tools"
+Repository = "https://github.com/nometria/growth-tools"
