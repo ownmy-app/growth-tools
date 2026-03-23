@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 def test_brand_name_reads_from_env(monkeypatch):
     monkeypatch.setenv("BRAND_NAME", "TestBrand")
-    from core import llm
+    from growth_tools.core import llm
     import importlib
     importlib.reload(llm)
     assert llm.BRAND_NAME == "TestBrand"
@@ -16,7 +16,7 @@ def test_brand_name_reads_from_env(monkeypatch):
 
 def test_brand_tagline_reads_from_env(monkeypatch):
     monkeypatch.setenv("BRAND_TAGLINE", "Build fast, ship faster")
-    from core import llm
+    from growth_tools.core import llm
     import importlib
     importlib.reload(llm)
     assert llm.BRAND_TAGLINE == "Build fast, ship faster"
@@ -24,7 +24,7 @@ def test_brand_tagline_reads_from_env(monkeypatch):
 
 def test_icp_pain_reads_from_env(monkeypatch):
     monkeypatch.setenv("ICP_PAIN", "too much config, not enough shipping")
-    from core import llm
+    from growth_tools.core import llm
     import importlib
     importlib.reload(llm)
     assert llm.ICP_PAIN == "too much config, not enough shipping"
@@ -33,7 +33,7 @@ def test_icp_pain_reads_from_env(monkeypatch):
 def test_no_hardcoded_brand_names_in_source():
     """Ensure OwnMyApp or Nometria don't appear in llm.py prompts."""
     llm_path = os.path.join(
-        os.path.dirname(__file__), "..", "src", "core", "llm.py"
+        os.path.dirname(__file__), "..", "src", "growth_tools", "core", "llm.py"
     )
     with open(llm_path) as f:
         content = f.read()

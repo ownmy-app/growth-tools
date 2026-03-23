@@ -28,7 +28,7 @@ ICP_PAIN       = os.environ.get("ICP_PAIN",       "move from prototype to produc
 
 def _get_client():
     from openai import OpenAI
-    from config.settings import get_settings
+    from growth_tools.config.settings import get_settings
     s = get_settings()
     s.require_openai()
     return OpenAI(api_key=s.openai_api_key), s.openai_model
