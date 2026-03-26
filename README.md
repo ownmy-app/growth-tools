@@ -11,7 +11,7 @@ without hiring a full-time growth team.
 
 ```bash
 # Clone and install
-git clone https://github.com/ownmy-app/growth-tools
+git clone https://github.com/nometria/growth-tools
 cd growth-tools
 pip install -e .
 
@@ -95,7 +95,7 @@ create table lead_signals (
 ## Setup
 
 ```bash
-git clone https://github.com/ownmy-app/growth-tools
+git clone https://github.com/nometria/growth-tools
 cd growth-tools
 pip install -e .
 cp examples/sample-icp.env .env
