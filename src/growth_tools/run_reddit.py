@@ -1,6 +1,5 @@
 """CLI entry point for growth-reddit."""
 import argparse
-import sys
 
 
 def main():
