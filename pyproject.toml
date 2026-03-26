@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "growth-tools"
-version = "0.1.1"
+version = "0.1.2"
 description = "Lead capture from Reddit, Discord and GitHub with hybrid LLM scoring and outreach drafts."
 readme = "README.md"
 license = { text = "MIT" }
