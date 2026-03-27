@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "growth-tools"
-version = "0.1.2"
+version = "0.2.0"
 description = "Lead capture from Reddit, Discord and GitHub with hybrid LLM scoring and outreach drafts."
 readme = "README.md"
 license = { text = "MIT" }
@@ -32,6 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "pytest-cov"]
+yaml = ["pyyaml>=6.0"]
 
 [project.scripts]
 growth-reddit = "growth_tools.run_reddit:main"

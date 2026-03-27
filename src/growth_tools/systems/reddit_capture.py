@@ -20,7 +20,8 @@ from core.db import save_lead, LeadRecord, is_db_available
 
 logger = logging.getLogger(__name__)
 
-SUBREDDITS = [
+# Legacy hard-coded defaults (overridden by config_loader when available)
+_FALLBACK_SUBREDDITS = [
     "replit",
     "lovable",
     "vibecoding",
@@ -30,7 +31,7 @@ SUBREDDITS = [
     "entrepreneur",
 ]
 
-KEYWORDS = [
+_FALLBACK_KEYWORDS = [
     "deploy",
     "deployment",
     "production",
@@ -46,11 +47,24 @@ KEYWORDS = [
 ]
 
 
-def contains_keyword(text: str) -> bool:
+def _load_subreddits_and_keywords():
+    """Load subreddits and keywords from YAML config, falling back to defaults."""
+    try:
+        from growth_tools.config_loader import load_config
+        cfg = load_config()
+        return cfg.subreddits, cfg.keywords, cfg.hot_threshold
+    except Exception as exc:
+        logger.debug("Config loader unavailable (%s); using built-in defaults", exc)
+        return _FALLBACK_SUBREDDITS, _FALLBACK_KEYWORDS, 80
+
+
+def contains_keyword(text: str, keywords: list = None) -> bool:
     if not text:
         return False
+    if keywords is None:
+        _, keywords, _ = _load_subreddits_and_keywords()
     t = text.lower()
-    return any(k in t for k in KEYWORDS)
+    return any(k in t for k in keywords)
 
 
 def get_reddit_client():
@@ -66,24 +80,37 @@ def get_reddit_client():
 def run_once(limit_per_sub: int = 25, save_to_db: bool = True, generate_drafts: bool = True) -> list:
     """
     Run one pass over configured subreddits. Returns list of captured lead dicts.
+
+    Subreddits, keywords, and scoring thresholds are loaded from YAML config
+    (see config_loader.py) with env-var and built-in defaults as fallback.
     """
     settings = get_settings()
     settings.require_reddit()
     settings.require_openai()
     threshold = settings.lead_intent_threshold
 
+    # Load configurable subreddits, keywords, and hot threshold
+    subreddits, keywords, hot_threshold = _load_subreddits_and_keywords()
+
     reddit = get_reddit_client()
     use_db = save_to_db and is_db_available()
     if save_to_db and not use_db:
         logger.warning("Supabase not configured or unreachable; leads will not be saved")
 
+    # Import notification helper (lazy to avoid import cycle)
+    try:
+        from growth_tools.notifications import notify_if_hot
+        _notify = True
+    except Exception:
+        _notify = False
+
     captured = []
-    for sub in SUBREDDITS:
+    for sub in subreddits:
         try:
             subreddit = reddit.subreddit(sub)
             for post in subreddit.new(limit=limit_per_sub):
                 full_text = f"{post.title}\n{post.selftext or ''}"
-                if not contains_keyword(full_text):
+                if not contains_keyword(full_text, keywords):
                     continue
 
                 try:
@@ -142,7 +169,7 @@ def run_once(limit_per_sub: int = 25, save_to_db: bool = True, generate_drafts: 
                     except Exception as e:
                         logger.warning("Save lead failed: %s", e)
 
-                captured.append({
+                lead_dict = {
                     "subreddit": sub,
                     "title": post.title,
                     "url": source_url,
@@ -151,9 +178,18 @@ def run_once(limit_per_sub: int = 25, save_to_db: bool = True, generate_drafts: 
                     "tier": tier,
                     "builder": builder,
                     "pain_type": pain,
+                    "platform": "reddit",
                     "classification": result,
-                })
+                }
+                captured.append(lead_dict)
                 logger.info("Lead captured: %s | %s", source_url, tier)
+
+                # Slack notification for hot leads
+                if _notify:
+                    try:
+                        notify_if_hot(lead_dict, hot_threshold=hot_threshold)
+                    except Exception as e:
+                        logger.debug("Slack notify failed: %s", e)
 
         except Exception as e:
             logger.warning("Subreddit r/%s failed: %s", sub, e)
