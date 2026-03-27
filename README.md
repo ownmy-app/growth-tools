@@ -1,6 +1,6 @@
 # growth-tools
 
-> Automated lead capture from Reddit, Discord and GitHub — with hybrid LLM scoring and outreach drafts.
+> Automated lead capture from Reddit, Discord and GitHub -- with hybrid LLM scoring and outreach drafts.
 
 Built for dev-tool and SaaS companies that want inbound signal from developer communities
 without hiring a full-time growth team.
@@ -10,33 +10,111 @@ without hiring a full-time growth team.
 ## Quick start
 
 ```bash
-# Clone and install
-git clone https://github.com/nometria/growth-tools
-cd growth-tools
-pip install -e .
+pip install growth-tools
 
-# Configure your environment
+# Configure
 cp examples/sample-icp.env .env
 # Edit .env with your API keys and brand config
 
-# Run Reddit monitor (one-shot)
-growth-reddit
-
-# Run the website auditor API
-growth-api
-# or: uvicorn growth_tools.api.main:app --port 8000
-
-# Run tests
-pytest tests/ -v
+# One command to run anything:
+growth-tools reddit          # scan subreddits for leads
+growth-tools api             # start the REST API
+growth-tools discord         # run the Discord bot
+growth-tools scan            # scan GitHub for competitor SDK repos
 ```
 
-Required environment variables (see `examples/sample-icp.env`):
+---
+
+## Unified CLI
+
+Everything runs through `growth-tools <command>`:
+
+```
+$ growth-tools --help
+
+usage: growth-tools [-h] [--version] {reddit,api,discord,scan} ...
+
+Automated lead capture from Reddit, Discord, and GitHub with hybrid LLM scoring.
+
+commands:
+  reddit     Monitor subreddits for high-intent leads
+  api        Start the REST API server (website + GitHub auditor)
+  discord    Run the Discord bot (persistent)
+  scan       Scan GitHub for repos importing competitor SDKs
+
+examples:
+  growth-tools reddit              Scan subreddits for leads
+  growth-tools reddit --limit 50   Scan with 50 posts per subreddit
+  growth-tools api                 Start REST API on port 8000
+  growth-tools api --port 3000     Start REST API on custom port
+  growth-tools discord             Run Discord bot
+  growth-tools scan                Scan GitHub for competitor SDK repos
+  growth-tools scan --sdks firebase,appwrite
+```
+
+The legacy `growth-reddit` and `growth-api` commands still work for backward compatibility.
+
+---
+
+## Multi-LLM support
+
+By default growth-tools uses OpenAI. Switch to any provider with two env vars:
+
+| Provider | `LLM_PROVIDER` | `LLM_MODEL` default | Install |
+|----------|----------------|----------------------|---------|
+| OpenAI | `openai` (default) | `gpt-4.1-mini` | included |
+| Anthropic | `anthropic` | `claude-sonnet-4-20250514` | `pip install growth-tools[anthropic]` |
+| LiteLLM (100+ providers) | `litellm` | `gpt-4.1-mini` | `pip install growth-tools[litellm]` |
+
 ```bash
-OPENAI_API_KEY=sk-proj-...
+# Use Anthropic Claude
+export LLM_PROVIDER=anthropic
+export LLM_MODEL=claude-sonnet-4-20250514
+export ANTHROPIC_API_KEY=sk-ant-...
+growth-tools reddit
+
+# Use any provider via LiteLLM (Gemini, Mistral, Ollama, etc.)
+export LLM_PROVIDER=litellm
+export LLM_MODEL=gemini/gemini-2.0-flash
+growth-tools reddit
+
+# Install all LLM providers at once
+pip install growth-tools[all-llm]
+```
+
+All LLM calls (classification, scoring, outreach drafts) route through a single `ask_llm()` function that handles provider switching, retries, and model fallbacks automatically.
+
+---
+
+## Environment variables
+
+Required (see `examples/sample-icp.env`):
+
+```bash
+# LLM provider (pick one)
+LLM_PROVIDER=openai              # openai | anthropic | litellm
+LLM_MODEL=gpt-4.1-mini           # model name (optional, sensible defaults)
+OPENAI_API_KEY=sk-proj-...       # required for openai/litellm
+ANTHROPIC_API_KEY=sk-ant-...     # required for anthropic
+
+# Reddit credentials
 REDDIT_CLIENT_ID=...
 REDDIT_CLIENT_SECRET=...
+
+# Brand identity (used in LLM-generated outreach)
 BRAND_NAME="Your Product"
-ICP_KEYWORDS="supabase,self-host,postgres,..."
+BRAND_TAGLINE="helps teams ship production-ready apps"
+ICP_PAIN="move from prototype to production"
+```
+
+Optional:
+
+```bash
+SUPABASE_URL=...                  # lead storage
+SUPABASE_SERVICE_ROLE_KEY=...
+DISCORD_TOKEN=...                 # Discord bot
+GITHUB_TOKEN=ghp_...              # GitHub API (for scan command)
+SLACK_WEBHOOK_URL=...             # Slack notifications for hot leads
 ```
 
 ---
@@ -45,16 +123,17 @@ ICP_KEYWORDS="supabase,self-host,postgres,..."
 
 | Module | What it does |
 |--------|-------------|
-| `systems/reddit_capture.py` | Monitors subreddits, two-stage filter (keyword → LLM), saves hot leads |
+| `systems/reddit_capture.py` | Monitors subreddits, two-stage filter (keyword then LLM), saves hot leads |
 | `systems/discord_bot.py` | Discord bot with per-channel cooldown, confidence threshold gating |
-| `systems/website_auditor.py` | Detects tech stack from HTML/headers (Next.js, Vite, Supabase, Vercel…) |
+| `systems/website_auditor.py` | Detects tech stack from HTML/headers (Next.js, Vite, Supabase, Vercel...) |
 | `systems/github_auditor.py` | Scans repos for migration readiness + competitor SDK lead capture |
 | `systems/crm_sequencer.py` | LLM-generated outreach drafts (capped at 90 words for reply rates) |
-| `core/scoring.py` | Hybrid rule + LLM scoring: `0.5 × rule_score + 0.5 × llm_intent_score` |
-| `core/llm.py` | OpenAI client with fallback model + tenacity retries |
+| `core/scoring.py` | Hybrid rule + LLM scoring: `0.5 * rule_score + 0.5 * llm_intent_score` |
+| `core/llm.py` | Multi-provider LLM layer (OpenAI, Anthropic, LiteLLM) with fallback + retries |
 | `config_loader.py` | YAML-based configuration (subreddits, keywords, thresholds, competitor SDKs) |
 | `notifications.py` | Slack webhook notifications for hot leads (Block Kit format) |
 | `api/main.py` | FastAPI: `POST /audit/website`, `POST /audit/github`, `GET /health` |
+| `cli.py` | Unified CLI entry point for all commands |
 
 ---
 
@@ -62,9 +141,9 @@ ICP_KEYWORDS="supabase,self-host,postgres,..."
 
 | Score | Tier | Action |
 |-------|------|--------|
-| ≥ 80 | **hot** | Immediate outreach |
-| 60–79 | **nurture** | Add to sequence |
-| 40–59 | **educate** | Send content |
+| >= 80 | **hot** | Immediate outreach |
+| 60-79 | **nurture** | Add to sequence |
+| 40-59 | **educate** | Send content |
 | < 40 | **ignore** | Skip |
 
 Rule signals: `+25` high-intent builder (Lovable/Replit/Bolt/v0), `+30` high-intent pain
@@ -100,28 +179,12 @@ create table lead_signals (
 git clone https://github.com/nometria/growth-tools
 cd growth-tools
 pip install -e .
+
+# Or with all LLM providers:
+pip install -e ".[all-llm]"
+
 cp examples/sample-icp.env .env
-# Edit .env
-```
-
----
-
-## Run
-
-```bash
-# Reddit monitor (one-shot)
-growth-reddit
-
-# Discord bot (persistent)
-python -m growth_tools.systems.discord_bot
-
-# Website auditor API
-growth-api
-# or: uvicorn growth_tools.api.main:app --port 8000
-
-# Audit a specific website
-curl -X POST http://localhost:8000/audit/website -H 'Content-Type: application/json' \
-  -d '{"url": "https://example.com"}'
+# Edit .env with your credentials
 ```
 
 ---
@@ -138,7 +201,7 @@ scoring:
   hot_threshold: 80
   nurture_threshold: 50
 
-# GitHub lead capture — SDK package names to scan for
+# GitHub lead capture -- SDK package names to scan for
 competitor_sdks: [firebase, appwrite, amplify, convex, pocketbase]
 ```
 
@@ -182,12 +245,12 @@ notify_if_hot(lead_dict, hot_threshold=80)
 
 ## GitHub lead capture
 
-The GitHub auditor now includes competitor SDK scanning. It searches GitHub for repos that `import` competitor SDKs and scores them as potential migration leads.
+The GitHub auditor includes competitor SDK scanning. It searches GitHub for repos that `import` competitor SDKs and scores them as potential migration leads.
 
 ```bash
-# CLI: scan for repos importing competitor SDKs
-python -m growth_tools.systems.github_auditor --scan
-python -m growth_tools.systems.github_auditor --scan firebase,appwrite
+# CLI
+growth-tools scan
+growth-tools scan --sdks firebase,appwrite --min-score 30
 
 # Python API
 from growth_tools.systems.github_auditor import search_competitor_sdk_repos
@@ -207,50 +270,45 @@ Requires `GITHUB_TOKEN` for authenticated code search (unauthenticated requests 
 
 ## Customise
 
-**Target subreddits** — set in `growth.yml` or `GROWTH_SUBREDDITS` env var
+**LLM provider** -- set `LLM_PROVIDER` and `LLM_MODEL` env vars
 
-**Lead scoring** — edit weights in `core/scoring.py` or adjust thresholds in `growth.yml`
+**Target subreddits** -- set in `growth.yml` or `GROWTH_SUBREDDITS` env var
 
-**Outreach tone** — edit prompts in `core/llm.py`
+**Lead scoring** -- edit weights in `core/scoring.py` or adjust thresholds in `growth.yml`
 
-**Competitor SDKs** — set in `growth.yml` or `GROWTH_COMPETITOR_SDKS` env var
+**Outreach tone** -- edit prompts in `core/llm.py`
 
----
-
-## Immediate next steps
-1. ~~Make subreddits + keywords configurable via env / YAML~~ Done
-2. ~~Add GitHub lead capture (scan repos that import competitor SDKs)~~ Done
-3. ~~Add Slack notification on "hot" leads~~ Done
-4. Package as `pip install growth-tools`
+**Competitor SDKs** -- set in `growth.yml` or `GROWTH_COMPETITOR_SDKS` env var
 
 ---
 
-## Commercial viability
-- Open-core: open source the capture + scoring, charge for the CRM sequencer
-- SaaS: $200–500/mo per team for managed lead pipeline
-- Competitors: Trigify, Drippi — neither does GitHub + Reddit + LLM scoring combined
+## Python API
 
----
+```python
+from growth_tools.core.llm import (
+    ask_llm,
+    classify_post_intent,
+    generate_reply_draft,
+    generate_outreach_draft,
+    classify_discord_message,
+    score_message,
+)
 
-## Example output
+# Use the unified LLM layer directly
+response = ask_llm("Summarize this lead...", json_mode=True)
 
-Running `pytest tests/ -v`:
+# Classify a post
+result = classify_post_intent("Need help deploying my Lovable app", "...")
 
-```
-============================= test session starts ==============================
-platform darwin -- Python 3.13.9, pytest-9.0.2, pluggy-1.5.0
-cachedir: .pytest_cache
-rootdir: /tmp/ownmy-releases/growth-tools
-configfile: pyproject.toml
-plugins: anyio-4.12.1, cov-7.1.0
-collecting ... collected 4 items
-
-tests/test_brand_config.py::test_brand_name_reads_from_env PASSED        [ 25%]
-tests/test_brand_config.py::test_brand_tagline_reads_from_env PASSED     [ 50%]
-tests/test_brand_config.py::test_icp_pain_reads_from_env PASSED          [ 75%]
-tests/test_brand_config.py::test_no_hardcoded_brand_names_in_source PASSED [100%]
-
-============================== 4 passed in 0.03s ===============================
+# Score arbitrary text
+score = score_message("How do I migrate from Firebase to self-hosted?")
 ```
 
-See `examples/sample-leads.json` for representative scored lead output and `examples/sample-icp.env` for required environment variable configuration.
+---
+
+## Run tests
+
+```bash
+pip install -e ".[dev]"
+pytest tests/ -v
+```
