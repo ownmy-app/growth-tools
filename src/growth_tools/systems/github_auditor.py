@@ -209,7 +209,7 @@ def _score_repo_as_lead(repo: Dict[str, Any]) -> int:
     pushed_at = repo.get("pushed_at") or ""
     if pushed_at:
         try:
-            from datetime import datetime, timezone, timedelta
+            from datetime import datetime, timezone
             pushed = datetime.fromisoformat(pushed_at.replace("Z", "+00:00"))
             age_days = (datetime.now(timezone.utc) - pushed).days
             if age_days <= 30:
