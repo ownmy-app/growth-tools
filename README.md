@@ -1,16 +1,6 @@
 # growth-tools
 
-<div align="center">
-
-**[Nometria](https://nometria.com)** takes AI-built apps to production on AWS — secure, scalable, ready for real users.
-
-<sub><i>Finding developers who need deployment help means monitoring Reddit, Discord, and GitHub for intent signals. We built growth-tools to automate this -- and it works for any B2B SaaS.</i></sub>
-
-[![Deploy with Nometria](https://img.shields.io/badge/Deploy%20with-Nometria-111827?style=for-the-badge)](https://nometria.com)
-
-</div>
-
----
+Built by the [Nometria](https://nometria.com) team — we take AI-built apps to production.
 
 > Automated lead capture from Reddit, Discord and GitHub -- with hybrid LLM scoring and outreach drafts.
 
@@ -325,6 +315,3 @@ pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
----
-
-<p align="center">Made with ❤️ by <a href="https://nometria.com">Nometria</a> — deploy AI apps to production in one click</p>
